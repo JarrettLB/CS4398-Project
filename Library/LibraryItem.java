@@ -41,4 +41,8 @@ abstract class LibraryItem {
     public boolean canRenew() {
         return true;
     }
+
+    public boolean isAvailable() {
+        return dueDate == null; // If the due date is null, the item is available
+    }
 }

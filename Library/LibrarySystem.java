@@ -1,10 +1,7 @@
+import java.util.*;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
-class LibrarySystem {
+public class LibrarySystem {
     private Map<String, User> users;
     private List<Book> availableBooks;
     private List<AudioVideoMaterial> availableAudioVideoMaterials;
@@ -13,6 +10,10 @@ class LibrarySystem {
         this.users = new HashMap<>();
         this.availableBooks = new ArrayList<>();
         this.availableAudioVideoMaterials = new ArrayList<>();
+
+        // Initialize data using LibraryDataInitializer
+        LibraryData dataInitializer = new LibraryData(this);
+        dataInitializer.initData();
     }
 
     public void addUser(User user) {
@@ -85,4 +86,42 @@ class LibrarySystem {
             }
         }
     }
+
+    // New methods for core functionality
+
+    public User getUserByName(String userName) {
+        for (User user : users.values()) {
+            if (user.getName().equals(userName)) {
+                return user;
+            }
+        }
+        return null; // User not found
+    }
+
+    public LibraryItem getItemByTitle(String itemTitle) {
+        for (LibraryItem item : availableBooks) {
+            if (item.getTitle().equals(itemTitle)) {
+                return item;
+            }
+        }
+        for (LibraryItem item : availableAudioVideoMaterials) {
+            if (item.getTitle().equals(itemTitle)) {
+                return item;
+            }
+        }
+        return null; // Item not found
+    }
+
+    public List<User> getUsers() {
+        return new ArrayList<>(users.values());
+    }
+
+    public List<LibraryItem> getItems() {
+        List<LibraryItem> allItems = new ArrayList<>();
+        allItems.addAll(availableBooks);
+        allItems.addAll(availableAudioVideoMaterials);
+        return allItems;
+    }
+
+    
 }
