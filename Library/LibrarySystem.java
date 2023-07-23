@@ -2,12 +2,13 @@ import java.util.*;
 import java.time.LocalDate;
 
 public class LibrarySystem {
-    private Map<String, User> users;
+    private List<User> users;
     private List<Book> availableBooks;
     private List<AudioVideoMaterial> availableAudioVideoMaterials;
+    private static final int MAX_ALLOWED_CHECKOUTS = 5;
 
     public LibrarySystem() {
-        this.users = new HashMap<>();
+        this.users = new ArrayList<>();
         this.availableBooks = new ArrayList<>();
         this.availableAudioVideoMaterials = new ArrayList<>();
 
@@ -18,17 +19,21 @@ public class LibrarySystem {
 
     // Case 1: Add User
     public void addUser(User user) {
-        users.put(user.getLibraryCardNumber(), user);
+        users.add(user);
     }
 
     // Case 2: Lookup User
     public User getUserByLibraryCardNumber(String libraryCardNumber) {
-        return users.get(libraryCardNumber);
+        for (User user : users) {
+            if (user.getLibraryCardNumber().equals(libraryCardNumber)) {
+                return user;
+            }
+        }
+        return null;
     }
 
     // Case 3: Add Book
-    public void addBook(String title, boolean isReferenceOnly, boolean isBestSeller) {
-        Book book = new Book(title, isReferenceOnly, isBestSeller);
+    public void addBook(Book book) {
         availableBooks.add(book);
     }
 
@@ -65,30 +70,185 @@ public class LibrarySystem {
         return availableAudioVideoMaterials;
     }
 
-    public void checkOutItem(User user, LibraryItem item) {
-        if (!user.getCheckedOutItems().contains(item)) {
-            if (item instanceof Book && user.getCheckedOutItems().stream().filter(i -> i instanceof Book).count() >= 5) {
-                System.out.println("Children can only check out five items at a time.");
-                return;
+    public void handleShowCheckedOutItems(User user) {
+        // Show checked-out books
+        System.out.println("Books currently checked out:");
+        List<Book> checkedOutBooks = user.getCheckedOutBooks();
+        if (checkedOutBooks != null) {
+            for (Book checkedOutBook : checkedOutBooks) {
+                System.out.println(checkedOutBook.getTitle());
             }
-            user.checkOutItem(item);
-            System.out.println(item.getTitle() + " checked out successfully by " + user.getName());
         } else {
-            System.out.println("The user has already checked out this item.");
+            System.out.println("No books currently checked out.");
+        }
+
+        // Show checked-out audio/video materials
+        System.out.println("Audio/Video materials currently checked out:");
+        List<AudioVideoMaterial> checkedOutAVMaterials = user.getCheckedOutAVMaterials();
+        if (checkedOutAVMaterials != null) {
+            for (AudioVideoMaterial avMaterial : checkedOutAVMaterials) {
+                System.out.println(avMaterial.getTitle());
+            }
+        } else {
+            System.out.println("No audio/video materials currently checked out.");
         }
     }
 
-    public void returnItem(User user, LibraryItem item) {
-        if (user.getCheckedOutItems().contains(item)) {
-            user.returnItem(item);
-            System.out.println(item.getTitle() + " returned successfully by " + user.getName());
+    public void handleCheckOutBook(User user, LibrarySystem librarySystem){
+        System.out.println("Enter the title of the book you want to check out:");
+        Scanner scanner = new Scanner(System.in);
+        String bookTitle = scanner.nextLine();
+
+        boolean bookCheckedOut = librarySystem.checkoutItem(user, bookTitle);
+        if (bookCheckedOut) {
+            Book book = new Book(bookTitle, bookCheckedOut, bookCheckedOut);
+            System.out.println("Book \"" + bookTitle + "\" checked out successfully. Due date: " + book.getDueDate());
         } else {
-            System.out.println("The user hasn't checked out this item.");
+            System.out.println("Book \"" + bookTitle + "\" is not available or you have reached the maximum allowed checkouts.");
         }
     }
 
-    public void renewItem(User user, LibraryItem item) {
-        user.renewItem(item);
+    public void handleCheckoutAVMaterial(User user, LibrarySystem librarySystem){
+        System.out.println("Enter the title of the AV Material you want to check out:");
+        Scanner scanner = new Scanner(System.in);
+        String AVTitle = scanner.nextLine();
+
+        boolean AVItemCheckedOut = librarySystem.checkoutItem(user, AVTitle);
+        if (AVItemCheckedOut) {
+            AudioVideoMaterial avmaterial = new AudioVideoMaterial(AVTitle, AVItemCheckedOut, AVItemCheckedOut);
+            System.out.println("AV Material \"" + AVTitle + "\" checked out successfully. Due Date: " + avmaterial.getDueDate());
+        } else {
+            System.out.println("AV Material \"" + AVTitle + "\" is not available or you have reached the maximum allowed checkouts.");
+        }
+    }
+
+    public boolean checkoutItem(User user, String itemTitle) {
+        // Find the item (book or AV material) with the given title
+        LibraryItem itemToCheckout = null;
+    
+        // Check available books
+        for (Book book : availableBooks) {
+            if (book.getTitle().equalsIgnoreCase(itemTitle)) {
+                itemToCheckout = book;
+                break;
+            }
+        }
+    
+        // Check available audio/video materials if item is not found in books
+        if (itemToCheckout == null) {
+            for (AudioVideoMaterial avMaterial : availableAudioVideoMaterials) {
+                if (avMaterial.getTitle().equalsIgnoreCase(itemTitle)) {
+                    itemToCheckout = avMaterial;
+                    break;
+                }
+            }
+        }
+    
+        if (itemToCheckout == null || !itemToCheckout.isAvailable()) {
+            return false; // Item not found or already checked out
+        }
+    
+        // Check if the user has reached the maximum allowed checkouts
+        if (user.getCheckedOutBooks().size() >= MAX_ALLOWED_CHECKOUTS) {
+            return false; // User has reached the maximum allowed checkouts
+        }
+    
+        // Checkout the item to the user and set the due date
+        //itemToCheckout.handleCheckOutBook();
+    
+        // Set the due date based on the type of item
+        int checkoutPeriod = itemToCheckout.getCheckoutPeriod();
+        LocalDate dueDate = LocalDate.now().plusDays(checkoutPeriod);
+        itemToCheckout.setDueDate(dueDate);
+    
+        return true;
+    }
+    
+
+
+    public boolean returnItem(User user, String itemTitle) {
+        List<Book> availableBooks = getAvailableBooks();
+        List<Book> checkedOutBooks = user.getCheckedOutBooks();
+        List<AudioVideoMaterial> availableAVMaterials = getAvailableAudioVideoMaterials();
+        List<AudioVideoMaterial> checkedOutAVMaterials = user.getCheckedOutAVMaterials();
+
+        // Check if the item is a book
+        for (Book book : checkedOutBooks) {
+            if (book.getTitle().equalsIgnoreCase(itemTitle)) {
+                user.removeCheckedOutBook(book);
+                availableBooks.add(book);
+                return true;
+            }
+        }
+
+        // If the item is not a book, check if it is an AV material
+        for (AudioVideoMaterial avMaterial : checkedOutAVMaterials) {
+            if (avMaterial.getTitle().equalsIgnoreCase(itemTitle)) {
+                user.removeCheckedOutAVMaterial(avMaterial);
+                availableAVMaterials.add(avMaterial);
+                return true;
+            }
+        }
+
+        // Item not found in user's checked-out items
+        return false;
+    }
+
+    public boolean renewItem(User user, String itemTitle) {
+        List<Book> checkedOutBooks = user.getCheckedOutBooks();
+        List<AudioVideoMaterial> checkedOutAVMaterials = user.getCheckedOutAVMaterials();
+
+        // Check if the item is a book
+        for (Book book : checkedOutBooks) {
+            if (book.getTitle().equalsIgnoreCase(itemTitle)) {
+                if (book.canRenew()) {
+                    // If the item is requested by another user, it cannot be renewed
+                    if (isItemRequested(book)) {
+                        System.out.println("Cannot renew the book. There is an outstanding request for this item.");
+                        return false;
+                    } else {
+                        // Renew the book
+                        LocalDate newDueDate = book.getDueDate().plusDays(book.getCheckoutPeriod());
+                        book.setDueDate(newDueDate);
+                        System.out.println(book.getTitle() + " renewed successfully for " + user.getName());
+                        return true;
+                    }
+                } else {
+                    System.out.println("Cannot renew the book. Maximum renewal limit reached.");
+                    return false;
+                }
+            }
+        }
+
+        // If the item is not a book, check if it is an AV material
+        for (AudioVideoMaterial avMaterial : checkedOutAVMaterials) {
+            if (avMaterial.getTitle().equalsIgnoreCase(itemTitle)) {
+                if (avMaterial.canRenew()) {
+                    // If the item is requested by another user, it cannot be renewed
+                    if (isItemRequested(avMaterial)) {
+                        System.out.println("Cannot renew the AV material. There is an outstanding request for this item.");
+                        return false;
+                    } else {
+                        // Renew the AV material
+                        LocalDate newDueDate = avMaterial.getDueDate().plusDays(avMaterial.getCheckoutPeriod());
+                        avMaterial.setDueDate(newDueDate);
+                        System.out.println(avMaterial.getTitle() + " renewed successfully for " + user.getName());
+                        return true;
+                    }
+                } else {
+                    System.out.println("Cannot renew the AV material. Maximum renewal limit reached.");
+                    return false;
+                }
+            }
+        }
+
+        // Item not found
+        System.out.println("Item with the title \"" + itemTitle + "\" is not checked out by " + user.getName());
+        return false;
+    }
+
+    private boolean isItemRequested(LibraryItem item) {
+        return false;
     }
 
     public void requestItem(User user, LibraryItem item) {
@@ -99,58 +259,4 @@ public class LibrarySystem {
             System.out.println("Reference items cannot be requested.");
         }
     }
-
-    // Method to track due dates and calculate fines
-    public void trackDueDatesAndFines() {
-        LocalDate today = LocalDate.now();
-
-        for (User user : users.values()) {
-            for (LibraryItem item : user.getCheckedOutItems()) {
-                if (item.getDueDate() != null && item.getDueDate().isBefore(today)) {
-                    long daysOverdue = item.getDueDate().until(today).getDays();
-                    double overdueFine = Math.min(item.getFinePerDay() * daysOverdue, item.getMaxFine());
-                    System.out.println(user.getName() + " has an overdue item: " + item.getTitle() +
-                            " (Overdue for " + daysOverdue + " days). Fine: $" + overdueFine);
-                }
-            }
-        }
-    }
-
-    // New methods for core functionality
-
-    public User getUserByName(String userName) {
-        for (User user : users.values()) {
-            if (user.getName().equals(userName)) {
-                return user;
-            }
-        }
-        return null; // User not found
-    }
-
-    public LibraryItem getItemByTitle(String itemTitle) {
-        for (LibraryItem item : availableBooks) {
-            if (item.getTitle().equals(itemTitle)) {
-                return item;
-            }
-        }
-        for (LibraryItem item : availableAudioVideoMaterials) {
-            if (item.getTitle().equals(itemTitle)) {
-                return item;
-            }
-        }
-        return null; // Item not found
-    }
-
-    public List<User> getUsers() {
-        return new ArrayList<>(users.values());
-    }
-
-    public List<LibraryItem> getItems() {
-        List<LibraryItem> allItems = new ArrayList<>();
-        allItems.addAll(availableBooks);
-        allItems.addAll(availableAudioVideoMaterials);
-        return allItems;
-    }
-
-    
 }

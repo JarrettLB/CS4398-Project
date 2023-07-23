@@ -1,7 +1,13 @@
+import java.time.LocalDate;
 
-class AudioVideoMaterial extends LibraryItem {
+class AudioVideoMaterial extends LibraryItem implements Checkoutable {
+    private LocalDate dueDate;
+    private boolean checkedOut;
+
     public AudioVideoMaterial(String title, boolean isReferenceOnly, boolean isBestSeller) {
         super(title, isReferenceOnly, isBestSeller);
+        setDueDate(isBestSeller);
+        this.checkedOut = false;
     }
 
     @Override
@@ -16,11 +22,36 @@ class AudioVideoMaterial extends LibraryItem {
 
     @Override
     public int getCheckoutPeriod() {
-        return 14;
+        return 14; // Default checkout period for audio/video materials
+    }
+
+    public LocalDate getDueDate() {
+        return dueDate;
+    }
+
+    @Override
+    public void setDueDate(boolean isBestSeller) {
+        // Set the due date for audio/video materials based on whether it's a bestseller or not
+        int checkoutPeriod = isBestSeller ? 14 : 21;
+        this.dueDate = LocalDate.now().plusDays(checkoutPeriod);
     }
 
     @Override
     public boolean canRenew() {
         return true;
     }
+
+    public void setCheckedOut(boolean checkedOut) {
+        this.checkedOut = checkedOut;
+    }
+
+    @Override
+    public boolean isAvailable() {
+        return !checkedOut;
+    }
 }
+
+
+
+
+

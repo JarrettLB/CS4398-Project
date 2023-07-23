@@ -1,30 +1,37 @@
-import java.util.ArrayList;
-
 public class LibraryData {
-    private LibrarySystem library;
+    private LibrarySystem librarySystem;
 
     public LibraryData(LibrarySystem librarySystem) {
-        library = librarySystem;
+        this.librarySystem = librarySystem;
     }
 
     public void initData() {
-        // Create ArrayLists for users, books, and audio/video materials
-        ArrayList<User> users = new ArrayList<>();
-        ArrayList<Book> books = new ArrayList<>();
-        ArrayList<AudioVideoMaterial> avMaterials = new ArrayList<>();
-
         // Create and add some users
-        users.add(new User("Bedynek, Jarrett", "123 Main St", "555-1234", "0001", 28));
-        users.add(new User("Borja, Danny", "456 Oak Ave", "555-5678", "0002", 10));
-        users.add(new User("Edgar, Marshall", "789 Cedar Ave", "555-4861", "0003", 28));
+        User user1 = new User("Bedynek, Jarrett", "123 Main St", "555-1234", "0001", 28);
+        User user2 = new User("Borja, Danny", "456 Oak Ave", "555-5678", "0002", 10);
+        User user3 = new User("Edgar, Marshall", "789 Cedar Ave", "555-4861", "0003", 28);
+
+        // Add users to the LibrarySystem
+        librarySystem.addUser(user1);
+        librarySystem.addUser(user2);
+        librarySystem.addUser(user3);
 
         // Create and add some books
-        books.add(new Book("To Kill A Mockingbird", true, true));
-        books.add(new Book("The Great Gatsby", false, true));
-        books.add(new Book("Of Mice And Men", true, true));
+        Book book1 = new Book("To Kill A Mockingbird", true, true);
+        Book book2 = new Book("The Great Gatsby", false, true);
+        Book book3 = new Book("Of Mice And Men", true, true);
+
+        // Add books to the LibrarySystem
+        librarySystem.addBook(book1);
+        librarySystem.addBook(book2);
+        librarySystem.addBook(book3);
 
         // Create and add some audio/video materials
-        avMaterials.add(new AudioVideoMaterial("E.T. the Extra-Terrestrial", true, false));
-        avMaterials.add(new AudioVideoMaterial("Mrs. Doubtfire", false, true)); 
+        AudioVideoMaterial avMaterial1 = new AudioVideoMaterial("E.T. the Extra-Terrestrial", true, false);
+        AudioVideoMaterial avMaterial2 = new AudioVideoMaterial("Mrs. Doubtfire", false, true);
+
+        // Add audio/video materials to the LibrarySystem
+        librarySystem.addAudioVideoMaterial(avMaterial1);
+        librarySystem.addAudioVideoMaterial(avMaterial2);
     }
 }

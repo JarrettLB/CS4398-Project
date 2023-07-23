@@ -1,6 +1,13 @@
-class Book extends LibraryItem {
+import java.time.LocalDate;
+
+class Book extends LibraryItem implements Checkoutable{
+    private LocalDate dueDate;
+    private boolean checkedOut;
+
     public Book(String title, boolean isReferenceOnly, boolean isBestSeller) {
         super(title, isReferenceOnly, isBestSeller);
+        setDueDate(isBestSeller);
+        this.checkedOut = false;
     }
 
     @Override
@@ -18,8 +25,28 @@ class Book extends LibraryItem {
         return isBestSeller() ? 14 : 21;
     }
 
+    public LocalDate getDueDate() {
+        return dueDate;
+    }
+
+    @Override
+    public void setDueDate(boolean isBestSeller) {
+        // Set the due date based on whether the book is a bestseller or not
+        int checkoutPeriod = isBestSeller ? 14 : 21;
+        this.dueDate = LocalDate.now().plusDays(checkoutPeriod);
+    }
+
     @Override
     public boolean canRenew() {
         return true;
+    }
+
+    public void setCheckedOut(boolean checkedOut) {
+        this.checkedOut = checkedOut;
+    }
+
+    @Override
+    public boolean isAvailable() {
+        return !checkedOut;
     }
 }
