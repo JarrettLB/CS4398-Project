@@ -16,16 +16,45 @@ public class LibrarySystem {
         dataInitializer.initData();
     }
 
+    // Case 1: Add User
     public void addUser(User user) {
         users.put(user.getLibraryCardNumber(), user);
     }
 
-    public void addBook(Book book) {
+    // Case 2: Lookup User
+    public User getUserByLibraryCardNumber(String libraryCardNumber) {
+        return users.get(libraryCardNumber);
+    }
+
+    // Case 3: Add Book
+    public void addBook(String title, boolean isReferenceOnly, boolean isBestSeller) {
+        Book book = new Book(title, isReferenceOnly, isBestSeller);
         availableBooks.add(book);
     }
 
+    // Case 4: Lookup Book
+    public Book getBookByTitle(String title) {
+        for (Book book : availableBooks) {
+            if (book.getTitle().equalsIgnoreCase(title)) {
+                return book;
+            }
+        }
+        return null; // Book not found
+    }
+
+    // Case 5: Add Audio/Video Material
     public void addAudioVideoMaterial(AudioVideoMaterial avMaterial) {
         availableAudioVideoMaterials.add(avMaterial);
+    }
+
+    // Case 6: Lookup Audio/Video Material
+    public AudioVideoMaterial getAVMaterialByTitle(String title) {
+        for (AudioVideoMaterial avMaterial : availableAudioVideoMaterials) {
+            if (avMaterial.getTitle().equalsIgnoreCase(title)) {
+                return avMaterial;
+            }
+        }
+        return null; // Audio/Video Material not found
     }
 
     public List<Book> getAvailableBooks() {

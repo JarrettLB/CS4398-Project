@@ -7,13 +7,15 @@ class User {
     private String address;
     private String phoneNumber;
     private String libraryCardNumber;
+    private int age;
     private List<LibraryItem> checkedOutItems;
 
-    public User(String name, String address, String phoneNumber, String libraryCardNumber) {
+    public User(String name, String address, String phoneNumber, String libraryCardNumber, int age) {
         this.name = name;
         this.address = address;
         this.phoneNumber = phoneNumber;
         this.libraryCardNumber = libraryCardNumber;
+        this.age = age;
         this.checkedOutItems = new ArrayList<>();
     }
 
@@ -31,6 +33,10 @@ class User {
 
     public String getLibraryCardNumber() {
         return libraryCardNumber;
+    }
+
+    public int getAge(){
+        return age;
     }
 
     public List<LibraryItem> getCheckedOutItems() {
