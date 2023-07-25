@@ -31,7 +31,6 @@ class Book extends LibraryItem implements Checkoutable{
 
     @Override
     public void setDueDate(boolean isBestSeller) {
-        // Set the due date based on whether the book is a bestseller or not
         int checkoutPeriod = isBestSeller ? 14 : 21;
         this.dueDate = LocalDate.now().plusDays(checkoutPeriod);
     }

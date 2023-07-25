@@ -31,8 +31,8 @@ class AudioVideoMaterial extends LibraryItem implements Checkoutable {
 
     @Override
     public void setDueDate(boolean isBestSeller) {
-        // Set the due date for audio/video materials based on whether it's a bestseller or not
-        int checkoutPeriod = isBestSeller ? 14 : 21;
+        // Set the due date for audio/video materials at 14 days
+        int checkoutPeriod = 14;
         this.dueDate = LocalDate.now().plusDays(checkoutPeriod);
     }
 

@@ -18,13 +18,21 @@ public class LibraryData {
 
         // Create and add some books
         Book book1 = new Book("To Kill A Mockingbird", true, true);
-        Book book2 = new Book("The Great Gatsby", false, true);
-        Book book3 = new Book("Of Mice And Men", true, true);
+        Book book2 = new Book("A", false, false);
+        Book book3 = new Book("B", false, true);
+        Book book4 = new Book("C", false, true);
+        Book book5 = new Book("D", false, true);
+        Book book6 = new Book("E", false, true);
+        Book book7 = new Book("F", false, true);
 
         // Add books to the LibrarySystem
         librarySystem.addBook(book1);
         librarySystem.addBook(book2);
         librarySystem.addBook(book3);
+        librarySystem.addBook(book4);
+        librarySystem.addBook(book5);
+        librarySystem.addBook(book6);
+        librarySystem.addBook(book7);
 
         // Create and add some audio/video materials
         AudioVideoMaterial avMaterial1 = new AudioVideoMaterial("E.T. the Extra-Terrestrial", true, false);

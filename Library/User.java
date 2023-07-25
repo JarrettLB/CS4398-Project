@@ -18,6 +18,7 @@ class User {
         this.libraryCardNumber = libraryCardNumber;
         this.age = age;
         this.checkedOutBooks = new ArrayList<>();
+        this.checkedOutAVMaterials = new ArrayList<>();
     }
 
     public String getName() {
@@ -87,7 +88,7 @@ class User {
                     } else {
                         // Renew the item
                         LocalDate newDueDate = item.getDueDate().plusDays(item.getCheckoutPeriod());
-                        item.setDueDate(newDueDate);
+                        item.setDueDate(true);
                         System.out.println(item.getTitle() + " renewed successfully for " + getName());
                     }
                 } else {
@@ -105,7 +106,7 @@ class User {
                     } else {
                         // Renew the item
                         LocalDate newDueDate = item.getDueDate().plusDays(item.getCheckoutPeriod());
-                        item.setDueDate(newDueDate);
+                        item.setDueDate(true);
                         System.out.println(item.getTitle() + " renewed successfully for " + getName());
                     }
                 } else {

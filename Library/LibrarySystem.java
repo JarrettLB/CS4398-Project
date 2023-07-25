@@ -74,53 +74,62 @@ public class LibrarySystem {
         // Show checked-out books
         System.out.println("Books currently checked out:");
         List<Book> checkedOutBooks = user.getCheckedOutBooks();
-        if (checkedOutBooks != null) {
+        if (checkedOutBooks != null && !checkedOutBooks.isEmpty()) {
             for (Book checkedOutBook : checkedOutBooks) {
                 System.out.println(checkedOutBook.getTitle());
             }
         } else {
-            System.out.println("No books currently checked out.");
+            System.out.println(" ");
         }
 
         // Show checked-out audio/video materials
         System.out.println("Audio/Video materials currently checked out:");
         List<AudioVideoMaterial> checkedOutAVMaterials = user.getCheckedOutAVMaterials();
-        if (checkedOutAVMaterials != null) {
+        if (checkedOutAVMaterials != null && !checkedOutAVMaterials.isEmpty()) {
             for (AudioVideoMaterial avMaterial : checkedOutAVMaterials) {
                 System.out.println(avMaterial.getTitle());
             }
         } else {
-            System.out.println("No audio/video materials currently checked out.");
+            System.out.println(" ");
         }
     }
 
-    public void handleCheckOutBook(User user, LibrarySystem librarySystem){
+    public void handleCheckOutBook(User user, LibrarySystem librarySystem) {
         System.out.println("Enter the title of the book you want to check out:");
         Scanner scanner = new Scanner(System.in);
         String bookTitle = scanner.nextLine();
-
-        boolean bookCheckedOut = librarySystem.checkoutItem(user, bookTitle);
-        if (bookCheckedOut) {
-            Book book = new Book(bookTitle, bookCheckedOut, bookCheckedOut);
-            System.out.println("Book \"" + bookTitle + "\" checked out successfully. Due date: " + book.getDueDate());
+    
+        Book bookToCheckout = librarySystem.getBookByTitle(bookTitle);
+        if (bookToCheckout != null) {
+            boolean bookCheckedOut = librarySystem.checkoutItem(user, bookTitle);
+            if (bookCheckedOut) {
+                System.out.println("Book \"" + bookTitle + "\" checked out successfully. Due date: " + bookToCheckout.getDueDate());
+            } else {
+                System.out.println("Book \"" + bookTitle + "\" is not available or you have reached the maximum allowed checkouts.");
+            }
         } else {
-            System.out.println("Book \"" + bookTitle + "\" is not available or you have reached the maximum allowed checkouts.");
+            System.out.println("Book \"" + bookTitle + "\" not found in the library.");
         }
     }
-
-    public void handleCheckoutAVMaterial(User user, LibrarySystem librarySystem){
+    
+    public void handleCheckoutAVMaterial(User user, LibrarySystem librarySystem) {
         System.out.println("Enter the title of the AV Material you want to check out:");
         Scanner scanner = new Scanner(System.in);
         String AVTitle = scanner.nextLine();
-
-        boolean AVItemCheckedOut = librarySystem.checkoutItem(user, AVTitle);
-        if (AVItemCheckedOut) {
-            AudioVideoMaterial avmaterial = new AudioVideoMaterial(AVTitle, AVItemCheckedOut, AVItemCheckedOut);
-            System.out.println("AV Material \"" + AVTitle + "\" checked out successfully. Due Date: " + avmaterial.getDueDate());
+    
+        AudioVideoMaterial avMaterialToCheckout = librarySystem.getAVMaterialByTitle(AVTitle);
+        if (avMaterialToCheckout != null) {
+            boolean AVItemCheckedOut = librarySystem.checkoutItem(user, AVTitle);
+            if (AVItemCheckedOut) {
+                System.out.println("AV Material \"" + AVTitle + "\" checked out successfully. Due Date: " + avMaterialToCheckout.getDueDate());
+            } else {
+                System.out.println("AV Material \"" + AVTitle + "\" is not available or you have reached the maximum allowed checkouts.");
+            }
         } else {
-            System.out.println("AV Material \"" + AVTitle + "\" is not available or you have reached the maximum allowed checkouts.");
+            System.out.println("AV Material \"" + AVTitle + "\" not found in the library.");
         }
     }
+    
 
     public boolean checkoutItem(User user, String itemTitle) {
         // Find the item (book or AV material) with the given title
@@ -128,41 +137,60 @@ public class LibrarySystem {
     
         // Check available books
         for (Book book : availableBooks) {
-            if (book.getTitle().equalsIgnoreCase(itemTitle)) {
+            if (book.getTitle().equalsIgnoreCase(itemTitle) && book.isAvailable()) {
                 itemToCheckout = book;
                 break;
             }
         }
     
-        // Check available audio/video materials if item is not found in books
+        // Check available audio/video materials if the item is not found in books
         if (itemToCheckout == null) {
             for (AudioVideoMaterial avMaterial : availableAudioVideoMaterials) {
-                if (avMaterial.getTitle().equalsIgnoreCase(itemTitle)) {
+                if (avMaterial.getTitle().equalsIgnoreCase(itemTitle) && avMaterial.isAvailable()) {
                     itemToCheckout = avMaterial;
                     break;
                 }
             }
         }
     
-        if (itemToCheckout == null || !itemToCheckout.isAvailable()) {
-            return false; // Item not found or already checked out
+        if (itemToCheckout == null) {
+            System.out.println("Item with the title \"" + itemTitle + "\" not found.");
+            return false; // Item not found
+        }
+
+        // Check if the item is reference-only, and deny checkout if it is
+        if (itemToCheckout.isReferenceOnly()) {
+            System.out.println("Cannot check out \"" + itemTitle + "\" as it is a reference-only item.");
+            return false;
         }
     
         // Check if the user has reached the maximum allowed checkouts
-        if (user.getCheckedOutBooks().size() >= MAX_ALLOWED_CHECKOUTS) {
-            return false; // User has reached the maximum allowed checkouts
+        if (user.getAge() <= 12 && user.getCheckedOutBooks().size() + user.getCheckedOutAVMaterials().size() >= MAX_ALLOWED_CHECKOUTS) {
+            System.out.println("You have already checked out the maximum amount of items.");
+            return false;
         }
     
         // Checkout the item to the user and set the due date
-        //itemToCheckout.handleCheckOutBook();
+        if (itemToCheckout instanceof Book) {
+            // Check if the item is a bestseller
+            boolean isBestSeller = ((Book) itemToCheckout).isBestSeller();
+
+            // Set the due date based on whether the item is a bestseller or not
+            itemToCheckout.setDueDate(isBestSeller);
+        }
+
+        itemToCheckout.setCheckedOut(true);
     
-        // Set the due date based on the type of item
-        int checkoutPeriod = itemToCheckout.getCheckoutPeriod();
-        LocalDate dueDate = LocalDate.now().plusDays(checkoutPeriod);
-        itemToCheckout.setDueDate(dueDate);
+        // Add the checked-out item to the user's list of checked-out items
+        if (itemToCheckout instanceof Book) {
+            user.addCheckedOutBook((Book) itemToCheckout);
+        } else if (itemToCheckout instanceof AudioVideoMaterial) {
+            user.addCheckedOutAVMaterial((AudioVideoMaterial) itemToCheckout);
+        }
     
         return true;
     }
+    
     
 
 
@@ -209,7 +237,7 @@ public class LibrarySystem {
                     } else {
                         // Renew the book
                         LocalDate newDueDate = book.getDueDate().plusDays(book.getCheckoutPeriod());
-                        book.setDueDate(newDueDate);
+                        book.setDueDate(true);
                         System.out.println(book.getTitle() + " renewed successfully for " + user.getName());
                         return true;
                     }
@@ -231,7 +259,7 @@ public class LibrarySystem {
                     } else {
                         // Renew the AV material
                         LocalDate newDueDate = avMaterial.getDueDate().plusDays(avMaterial.getCheckoutPeriod());
-                        avMaterial.setDueDate(newDueDate);
+                        avMaterial.setDueDate(true);
                         System.out.println(avMaterial.getTitle() + " renewed successfully for " + user.getName());
                         return true;
                     }

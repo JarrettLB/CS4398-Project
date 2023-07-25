@@ -28,9 +28,9 @@ abstract class LibraryItem {
         return dueDate;
     }
 
-    public void setDueDate(LocalDate dueDate) {
-        this.dueDate = dueDate;
-    }
+    public abstract void setDueDate(boolean isBestSeller);
+
+    public abstract void setCheckedOut(boolean checkedOut);
 
     public abstract int getCheckoutPeriod();
 
