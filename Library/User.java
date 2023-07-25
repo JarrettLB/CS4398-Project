@@ -37,16 +37,16 @@ class User {
         return libraryCardNumber;
     }
 
+    public void setLibraryCardNumber(String libraryCardNumber) {
+        this.libraryCardNumber = libraryCardNumber;
+    }
+
     public int getAge(){
         return age;
     }
 
     public List<Book> getCheckedOutBooks() {
         return checkedOutBooks;
-    }
-
-    public List<AudioVideoMaterial> getCheckedOutAVMaterials() {
-        return checkedOutAVMaterials;
     }
 
     public void addCheckedOutBook(Book book) {
@@ -60,6 +60,10 @@ class User {
         if (checkedOutBooks != null) {
             checkedOutBooks.remove(book);
         }
+    }
+
+    public List<AudioVideoMaterial> getCheckedOutAVMaterials() {
+        return checkedOutAVMaterials;
     }
 
     public void addCheckedOutAVMaterial(AudioVideoMaterial avMaterial) {

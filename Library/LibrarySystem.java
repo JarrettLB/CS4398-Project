@@ -6,20 +6,25 @@ public class LibrarySystem {
     private List<Book> availableBooks;
     private List<AudioVideoMaterial> availableAudioVideoMaterials;
     private static final int MAX_ALLOWED_CHECKOUTS = 5;
+    private int nextLibraryCardNumber;
 
     public LibrarySystem() {
         this.users = new ArrayList<>();
         this.availableBooks = new ArrayList<>();
         this.availableAudioVideoMaterials = new ArrayList<>();
+        this.nextLibraryCardNumber = 1;
 
         // Initialize data using LibraryDataInitializer
         LibraryData dataInitializer = new LibraryData(this);
         dataInitializer.initData();
     }
 
-    // Case 1: Add User
+    // Case 1: Add User with the next available library card number
     public void addUser(User user) {
+        String libraryCardNumber = String.format("%04d", nextLibraryCardNumber);
+        user.setLibraryCardNumber(libraryCardNumber);
         users.add(user);
+        nextLibraryCardNumber++; // Increment the next library card number for the next user
     }
 
     // Case 2: Lookup User
@@ -62,21 +67,30 @@ public class LibrarySystem {
         return null; // Audio/Video Material not found
     }
 
+    // Returns next available library card number
+    public int getNextLibraryCardNumber() {
+        int nextLibraryCardNumber = users.size() + 1;
+        return nextLibraryCardNumber;
+    }
+
+    // Returns list of available books
     public List<Book> getAvailableBooks() {
         return availableBooks;
     }
 
+    // Returns list of available AV Material
     public List<AudioVideoMaterial> getAvailableAudioVideoMaterials() {
         return availableAudioVideoMaterials;
     }
 
+    // Shows lists of all checked out items for a user
     public void handleShowCheckedOutItems(User user) {
         // Show checked-out books
         System.out.println("Books currently checked out:");
         List<Book> checkedOutBooks = user.getCheckedOutBooks();
         if (checkedOutBooks != null && !checkedOutBooks.isEmpty()) {
             for (Book checkedOutBook : checkedOutBooks) {
-                System.out.println(checkedOutBook.getTitle());
+                System.out.println(checkedOutBook.getTitle() + " Due:(" + checkedOutBook.getDueDate() + ")");
             }
         } else {
             System.out.println(" ");
@@ -87,13 +101,14 @@ public class LibrarySystem {
         List<AudioVideoMaterial> checkedOutAVMaterials = user.getCheckedOutAVMaterials();
         if (checkedOutAVMaterials != null && !checkedOutAVMaterials.isEmpty()) {
             for (AudioVideoMaterial avMaterial : checkedOutAVMaterials) {
-                System.out.println(avMaterial.getTitle());
+                System.out.println(avMaterial.getTitle() + " Due:(" + avMaterial.getDueDate() + ")");
             }
         } else {
             System.out.println(" ");
         }
     }
 
+    // Handler for checking out books
     public void handleCheckOutBook(User user, LibrarySystem librarySystem) {
         System.out.println("Enter the title of the book you want to check out:");
         Scanner scanner = new Scanner(System.in);
@@ -112,6 +127,7 @@ public class LibrarySystem {
         }
     }
     
+    // Handler for checking out AV Material
     public void handleCheckoutAVMaterial(User user, LibrarySystem librarySystem) {
         System.out.println("Enter the title of the AV Material you want to check out:");
         Scanner scanner = new Scanner(System.in);
@@ -130,9 +146,8 @@ public class LibrarySystem {
         }
     }
     
-
+    // Checks out an item based on available material - verifies age, current amount of material checked out and bestSeller status
     public boolean checkoutItem(User user, String itemTitle) {
-        // Find the item (book or AV material) with the given title
         LibraryItem itemToCheckout = null;
     
         // Check available books
@@ -172,10 +187,7 @@ public class LibrarySystem {
     
         // Checkout the item to the user and set the due date
         if (itemToCheckout instanceof Book) {
-            // Check if the item is a bestseller
             boolean isBestSeller = ((Book) itemToCheckout).isBestSeller();
-
-            // Set the due date based on whether the item is a bestseller or not
             itemToCheckout.setDueDate(isBestSeller);
         }
 
@@ -187,13 +199,10 @@ public class LibrarySystem {
         } else if (itemToCheckout instanceof AudioVideoMaterial) {
             user.addCheckedOutAVMaterial((AudioVideoMaterial) itemToCheckout);
         }
-    
         return true;
     }
-    
-    
 
-
+    // Return an item that a user has checked out
     public boolean returnItem(User user, String itemTitle) {
         List<Book> availableBooks = getAvailableBooks();
         List<Book> checkedOutBooks = user.getCheckedOutBooks();
@@ -222,6 +231,7 @@ public class LibrarySystem {
         return false;
     }
 
+    // Renew an item once after checking it is not requested
     public boolean renewItem(User user, String itemTitle) {
         List<Book> checkedOutBooks = user.getCheckedOutBooks();
         List<AudioVideoMaterial> checkedOutAVMaterials = user.getCheckedOutAVMaterials();

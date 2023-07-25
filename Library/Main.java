@@ -25,10 +25,11 @@ public class Main {
             System.out.println("    0. Exit");
             System.out.print("Enter your choice: ");
             choice = scanner.nextInt();
-            scanner.nextLine(); // Consume the newline character after reading the integer input
+            scanner.nextLine();
 
             switch (choice) {
                 case 1:
+                    // Add User Form
                     System.out.println("Please enter the following information:");
 
                     System.out.print("Name: ");
@@ -41,13 +42,15 @@ public class Main {
                     String phoneNumber = scanner.nextLine();
 
                     System.out.print("Library Card Number: ");
-                    String libraryCardNumber = scanner.nextLine();
+                    int nextLibraryCardNumber = librarySystem.getNextLibraryCardNumber();
+                    String libraryCardNumber = String.format("%04d", nextLibraryCardNumber);
+                    System.out.println(libraryCardNumber);
 
                     System.out.print("Age: ");
                     int age = scanner.nextInt();
-                    scanner.nextLine(); // Consume the newline character after reading the integer input
+                    scanner.nextLine();
 
-                    User newUser = new User(name, address, phoneNumber, libraryCardNumber, age);
+                    User newUser = new User(name, address, phoneNumber, String.format("%04d", nextLibraryCardNumber), age);
                     librarySystem.addUser(newUser);
                     break;
 
@@ -65,7 +68,7 @@ public class Main {
                         System.out.println("Library Card Number: " + foundUser.getLibraryCardNumber());
                         System.out.println("Age: " + foundUser.getAge());
 
-                        // Nested switch case for options when a user is found
+                        // Options when a user is found
                         int userOption;
                         do {
                             System.out.println("\nOptions for the found user:");
@@ -199,11 +202,11 @@ public class Main {
 
                     System.out.print("Is Reference Only (true/false): ");
                     boolean avIsReferenceOnly = scanner.nextBoolean();
-                    scanner.nextLine(); // Consume the newline character after reading the boolean input
+                    scanner.nextLine();
 
                     System.out.print("Is Best Seller (true/false): ");
                     boolean avIsBestSeller = scanner.nextBoolean();
-                    scanner.nextLine(); // Consume the newline character after reading the boolean input
+                    scanner.nextLine();
 
                     librarySystem.addAudioVideoMaterial(new AudioVideoMaterial(avTitle, avIsReferenceOnly, avIsBestSeller));
                     System.out.println("Audio/Video Material added successfully!");
