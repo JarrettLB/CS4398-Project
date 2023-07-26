@@ -67,6 +67,7 @@ public class Main {
                         System.out.println("Phone Number: " + foundUser.getPhoneNumber());
                         System.out.println("Library Card Number: " + foundUser.getLibraryCardNumber());
                         System.out.println("Age: " + foundUser.getAge());
+                        System.out.println("Outstanding Fines: $" + String.format("%.2f", librarySystem.calculateOverdueFines(foundUser)));
 
                         // Options when a user is found
                         int userOption;
@@ -80,6 +81,7 @@ public class Main {
 
                             System.out.print("Enter your choice: ");
                             userOption = scanner.nextInt();
+                            scanner.nextLine();
 
                             switch (userOption) {
                                 case 1:
@@ -97,7 +99,7 @@ public class Main {
                     
                                         System.out.print("Enter your choice: ");
                                         checkoutOption = scanner.nextInt();
-                                        scanner.nextLine(); // Consume the newline character after reading the integer input
+                                        scanner.nextLine();
                     
                                         switch (checkoutOption) {
                                             case 1:
@@ -116,32 +118,21 @@ public class Main {
                                     } while (checkoutOption != 0);
                                     break;
                                         
-                                case 3:
+                                    case 3:
                                     // Return an Item
-                                    System.out.print("Enter the title of the item to return: ");
-                                    String returnTitle = scanner.nextLine();
-
-                                    // Assuming the LibrarySystem has a method to return the item
-                                    boolean returnSuccess = librarySystem.returnItem(foundUser, returnTitle);
+                                    boolean returnSuccess = librarySystem.returnItem(foundUser, scanner);
                                     if (returnSuccess) {
-                                        System.out.println("Item returned successfully.");
+                                        System.out.println("Item returned successfully by " + foundUser.getName() + ".");
                                     } else {
                                         System.out.println("Item not found in the user's checked-out items.");
                                     }
                                     break;
+                                
+                                
 
                                 case 4:
                                     // Renew an Item
-                                    System.out.print("Enter the title of the item to renew: ");
-                                    String renewTitle = scanner.nextLine();
-
-                                    // Assuming the LibrarySystem has a method to renew the item
-                                    boolean renewSuccess = librarySystem.renewItem(foundUser,renewTitle);
-                                    if (renewSuccess) {
-                                        System.out.println("Item renewed successfully.");
-                                    } else {
-                                        System.out.println("Item not found in the user's checked-out items.");
-                                    }
+                                    librarySystem.renewItem(foundUser, scanner);
                                     break;
 
                                 case 0:

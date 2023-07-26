@@ -1,3 +1,5 @@
+import java.time.LocalDate;
+
 public class LibraryData {
     private LibrarySystem librarySystem;
 
@@ -36,12 +38,19 @@ public class LibraryData {
         librarySystem.addBook(book6);
         librarySystem.addBook(book7);
 
+        // Create and add an overdue book to a user
+        Book overdueBook = new Book("Overdue Book", false, false);
+        overdueBook.setDueDate(true); // Due date set 14 days in the past
+        user2.addCheckedOutBook(overdueBook);
+
         // Create and add some audio/video materials
-        AudioVideoMaterial avMaterial1 = new AudioVideoMaterial("E.T. the Extra-Terrestrial", true, false);
-        AudioVideoMaterial avMaterial2 = new AudioVideoMaterial("Mrs. Doubtfire", false, true);
+        AudioVideoMaterial avMaterial1 = new AudioVideoMaterial("X", false, false);
+        AudioVideoMaterial avMaterial2 = new AudioVideoMaterial("Y", false, true);
+        AudioVideoMaterial avMaterial3 = new AudioVideoMaterial("Z", false, true);
 
         // Add audio/video materials to the LibrarySystem
         librarySystem.addAudioVideoMaterial(avMaterial1);
         librarySystem.addAudioVideoMaterial(avMaterial2);
+        librarySystem.addAudioVideoMaterial(avMaterial3);
     }
 }

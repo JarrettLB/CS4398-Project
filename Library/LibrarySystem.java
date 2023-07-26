@@ -1,5 +1,6 @@
 import java.util.*;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 
 public class LibrarySystem {
     private List<User> users;
@@ -110,7 +111,7 @@ public class LibrarySystem {
 
     // Handler for checking out books
     public void handleCheckOutBook(User user, LibrarySystem librarySystem) {
-        System.out.println("Enter the title of the book you want to check out:");
+        System.out.print("Enter the title of the book you want to check out:");
         Scanner scanner = new Scanner(System.in);
         String bookTitle = scanner.nextLine();
     
@@ -129,7 +130,7 @@ public class LibrarySystem {
     
     // Handler for checking out AV Material
     public void handleCheckoutAVMaterial(User user, LibrarySystem librarySystem) {
-        System.out.println("Enter the title of the AV Material you want to check out:");
+        System.out.print("Enter the title of the AV Material you want to check out:");
         Scanner scanner = new Scanner(System.in);
         String AVTitle = scanner.nextLine();
     
@@ -202,43 +203,54 @@ public class LibrarySystem {
         return true;
     }
 
-    // Return an item that a user has checked out
-    public boolean returnItem(User user, String itemTitle) {
-        List<Book> availableBooks = getAvailableBooks();
+    public boolean returnItem(User user, Scanner scanner) {
         List<Book> checkedOutBooks = user.getCheckedOutBooks();
-        List<AudioVideoMaterial> availableAVMaterials = getAvailableAudioVideoMaterials();
         List<AudioVideoMaterial> checkedOutAVMaterials = user.getCheckedOutAVMaterials();
-
+    
+        // Show items currently checked out to the user
+        handleShowCheckedOutItems(user);
+    
+        System.out.print("Enter the title of the item to return: ");
+        String returnTitle = scanner.nextLine();
+    
         // Check if the item is a book
         for (Book book : checkedOutBooks) {
-            if (book.getTitle().equalsIgnoreCase(itemTitle)) {
+            if (book.getTitle().equals(returnTitle)){
+                book.returnBook();
                 user.removeCheckedOutBook(book);
-                availableBooks.add(book);
                 return true;
             }
         }
-
-        // If the item is not a book, check if it is an AV material
+    
+        // Check if the item is an AV material
         for (AudioVideoMaterial avMaterial : checkedOutAVMaterials) {
-            if (avMaterial.getTitle().equalsIgnoreCase(itemTitle)) {
+            if (avMaterial.getTitle().equals(returnTitle)) {
+                avMaterial.returnAVMaterial();
                 user.removeCheckedOutAVMaterial(avMaterial);
-                availableAVMaterials.add(avMaterial);
                 return true;
             }
         }
-
+    
         // Item not found in user's checked-out items
+        System.out.println("Item with the title \"" + returnTitle + "\" is not checked out by " + user.getName());
         return false;
     }
+    
+    
 
     // Renew an item once after checking it is not requested
-    public boolean renewItem(User user, String itemTitle) {
+    public boolean renewItem(User user, Scanner scanner) {
         List<Book> checkedOutBooks = user.getCheckedOutBooks();
         List<AudioVideoMaterial> checkedOutAVMaterials = user.getCheckedOutAVMaterials();
 
+        handleShowCheckedOutItems(user);
+
+        System.out.print("Enter the title of the item to renew: ");
+        String renewTitle = scanner.nextLine();
+
         // Check if the item is a book
         for (Book book : checkedOutBooks) {
-            if (book.getTitle().equalsIgnoreCase(itemTitle)) {
+            if (book.getTitle().equals(renewTitle)) {
                 if (book.canRenew()) {
                     // If the item is requested by another user, it cannot be renewed
                     if (isItemRequested(book)) {
@@ -248,7 +260,7 @@ public class LibrarySystem {
                         // Renew the book
                         LocalDate newDueDate = book.getDueDate().plusDays(book.getCheckoutPeriod());
                         book.setDueDate(true);
-                        System.out.println(book.getTitle() + " renewed successfully for " + user.getName());
+                        System.out.println(book.getTitle() + " renewed successfully for " + user.getName() + " (Due: " + book.getDueDate() + ")");
                         return true;
                     }
                 } else {
@@ -260,7 +272,7 @@ public class LibrarySystem {
 
         // If the item is not a book, check if it is an AV material
         for (AudioVideoMaterial avMaterial : checkedOutAVMaterials) {
-            if (avMaterial.getTitle().equalsIgnoreCase(itemTitle)) {
+            if (avMaterial.getTitle().equals(renewTitle)) {
                 if (avMaterial.canRenew()) {
                     // If the item is requested by another user, it cannot be renewed
                     if (isItemRequested(avMaterial)) {
@@ -270,7 +282,7 @@ public class LibrarySystem {
                         // Renew the AV material
                         LocalDate newDueDate = avMaterial.getDueDate().plusDays(avMaterial.getCheckoutPeriod());
                         avMaterial.setDueDate(true);
-                        System.out.println(avMaterial.getTitle() + " renewed successfully for " + user.getName());
+                        System.out.println(avMaterial.getTitle() + " renewed successfully for " + user.getName() + " (Due: " + avMaterial.getDueDate() + ")");
                         return true;
                     }
                 } else {
@@ -281,7 +293,7 @@ public class LibrarySystem {
         }
 
         // Item not found
-        System.out.println("Item with the title \"" + itemTitle + "\" is not checked out by " + user.getName());
+        System.out.println("Item with the title \"" + renewTitle + "\" is not checked out by " + user.getName());
         return false;
     }
 
@@ -297,4 +309,22 @@ public class LibrarySystem {
             System.out.println("Reference items cannot be requested.");
         }
     }
+
+    public double calculateOverdueFines(User user) {
+        double totalFines = 0.0;
+
+        for (Book checkedOutBook : user.getCheckedOutBooks()) {
+            if (checkedOutBook.isOverdue()) {
+                // Calculate the number of days the book is overdue
+                int daysOverdue = (int) ChronoUnit.DAYS.between(checkedOutBook.getDueDate(), LocalDate.now());
+                double fine = checkedOutBook.getFinePerDay() * daysOverdue;
+            
+                // Ensure the fine doesn't exceed the maximum allowed fine for a book
+                fine = Math.min(fine, checkedOutBook.getMaxFine());
+                totalFines += fine;
+        }
+    }
+    return totalFines;
+}
+
 }

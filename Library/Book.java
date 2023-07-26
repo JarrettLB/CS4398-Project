@@ -19,7 +19,15 @@ class Book extends LibraryItem implements Checkoutable{
     public double getMaxFine() {
         return 10.00; // Maximum fine for books is $10.00
     }
-    
+
+    public boolean isOverdue() {
+        if (this.isAvailable() && this.getDueDate() != null) {
+            LocalDate currentDate = LocalDate.now();
+            return currentDate.isAfter(this.getDueDate());
+        }
+        return false;
+    }
+  
     @Override
     public int getCheckoutPeriod() {
         return isBestSeller() ? 14 : 21;
@@ -31,8 +39,13 @@ class Book extends LibraryItem implements Checkoutable{
 
     @Override
     public void setDueDate(boolean isBestSeller) {
-        int checkoutPeriod = isBestSeller ? 14 : 21;
+        int checkoutPeriod = isBestSeller ? 14 : 21; // Set to negative values to test overdue fines
         this.dueDate = LocalDate.now().plusDays(checkoutPeriod);
+    }
+
+    public void returnBook() {
+        this.dueDate = null;
+        this.setCheckedOut(false);
     }
 
     @Override
