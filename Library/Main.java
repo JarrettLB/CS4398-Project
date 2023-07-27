@@ -95,6 +95,7 @@ public class Main {
                                         System.out.println("\nOptions for checking out item:");
                                         System.out.println("    1. Checkout Book");
                                         System.out.println("    2. Checkout Audio/Video Material");
+                                        System.out.println("    3. Request An Item");
                                         System.out.println("    0. Back to Previous Menu");
                     
                                         System.out.print("Enter your choice: ");
@@ -107,6 +108,24 @@ public class Main {
                                                 break;
                                             case 2:
                                                 librarySystem.handleCheckoutAVMaterial(foundUser, librarySystem);
+                                                break;
+                                            case 3:
+                                                // Request an Item
+                                                System.out.print("Enter the title of the item to request: ");
+                                                String requestTitle = scanner.nextLine();
+
+                                                // Find the item with the given title
+                                                Book foundBookForRequest = librarySystem.getBookByTitle(requestTitle);
+                                                AudioVideoMaterial foundAVMaterialForRequest = librarySystem.getAVMaterialByTitle(requestTitle);
+
+                                                // If the item is found, call the requestItem() method
+                                                if (foundBookForRequest != null) {
+                                                    librarySystem.requestItem(foundUser, foundBookForRequest);
+                                                } else if (foundAVMaterialForRequest != null) {
+                                                    librarySystem.requestItem(foundUser, foundAVMaterialForRequest);
+                                                } else {
+                                                    System.out.println("Item with the title \"" + requestTitle + "\" not found.");
+                                                }
                                                 break;
                                             case 0:
                                                 // Back to Previous Menu
@@ -179,6 +198,12 @@ public class Main {
                         System.out.println("Title: " + foundBook.getTitle());
                         System.out.println("Is Reference Only: " + foundBook.isReferenceOnly());
                         System.out.println("Is Best Seller: " + foundBook.isBestSeller());
+                        System.out.print("In Stock: ");
+                        if(foundBook.isAvailable()){
+                            System.out.println( "Yes");
+                        } else {
+                            System.out.println("No");
+                        }
                     } else {
                         System.out.println("Book with the provided title not found.");
                     }

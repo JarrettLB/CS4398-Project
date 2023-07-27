@@ -5,11 +5,13 @@ abstract class LibraryItem {
     private boolean isReferenceOnly;
     private boolean isBestSeller;
     private LocalDate dueDate;
+    //private boolean isItemRequested;
 
     public LibraryItem(String title, boolean isReferenceOnly, boolean isBestSeller) {
         this.title = title;
         this.isReferenceOnly = isReferenceOnly;
         this.isBestSeller = isBestSeller;
+        //this.isItemRequested = true;
     }
 
     public String getTitle() {
@@ -38,9 +40,15 @@ abstract class LibraryItem {
 
     public abstract double getMaxFine();
 
-    public boolean canRenew() {
+    public boolean canRenew(){
         return true;
     }
+
+    //private boolean isItemRequested() {
+    //    return isItemRequested;
+    //}
+
+    public abstract void toggleRequest(boolean isItemRequested);
 
     public boolean isAvailable() {
         return dueDate == null; // If the due date is null, the item is available

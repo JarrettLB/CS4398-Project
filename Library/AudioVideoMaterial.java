@@ -3,11 +3,13 @@ import java.time.LocalDate;
 class AudioVideoMaterial extends LibraryItem implements Checkoutable {
     private LocalDate dueDate;
     private boolean checkedOut;
+    private boolean isItemRequested;
 
     public AudioVideoMaterial(String title, boolean isReferenceOnly, boolean isBestSeller) {
         super(title, isReferenceOnly, isBestSeller);
         setDueDate(isBestSeller);
         this.checkedOut = false;
+        this.isItemRequested = true;
     }
 
     @Override
@@ -52,6 +54,15 @@ class AudioVideoMaterial extends LibraryItem implements Checkoutable {
     @Override
     public boolean isAvailable() {
         return !checkedOut;
+    }
+
+    public boolean isItemRequested() {
+        return isItemRequested;
+    }
+
+    @Override
+    public void toggleRequest(boolean isItemRequested) {
+        isItemRequested = !isItemRequested;
     }
 }
 

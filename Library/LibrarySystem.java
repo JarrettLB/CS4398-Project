@@ -8,12 +8,14 @@ public class LibrarySystem {
     private List<AudioVideoMaterial> availableAudioVideoMaterials;
     private static final int MAX_ALLOWED_CHECKOUTS = 5;
     private int nextLibraryCardNumber;
+    private boolean isItemRequested;
 
     public LibrarySystem() {
         this.users = new ArrayList<>();
         this.availableBooks = new ArrayList<>();
         this.availableAudioVideoMaterials = new ArrayList<>();
         this.nextLibraryCardNumber = 1;
+        this.isItemRequested = true;
 
         // Initialize data using LibraryDataInitializer
         LibraryData dataInitializer = new LibraryData(this);
@@ -46,7 +48,7 @@ public class LibrarySystem {
     // Case 4: Lookup Book
     public Book getBookByTitle(String title) {
         for (Book book : availableBooks) {
-            if (book.getTitle().equalsIgnoreCase(title)) {
+            if (book.getTitle().equals(title)) {
                 return book;
             }
         }
@@ -153,7 +155,7 @@ public class LibrarySystem {
     
         // Check available books
         for (Book book : availableBooks) {
-            if (book.getTitle().equalsIgnoreCase(itemTitle) && book.isAvailable()) {
+            if (book.getTitle().equals(itemTitle) && book.isAvailable()) {
                 itemToCheckout = book;
                 break;
             }
@@ -162,7 +164,7 @@ public class LibrarySystem {
         // Check available audio/video materials if the item is not found in books
         if (itemToCheckout == null) {
             for (AudioVideoMaterial avMaterial : availableAudioVideoMaterials) {
-                if (avMaterial.getTitle().equalsIgnoreCase(itemTitle) && avMaterial.isAvailable()) {
+                if (avMaterial.getTitle().equals(itemTitle) && avMaterial.isAvailable()) {
                     itemToCheckout = avMaterial;
                     break;
                 }
@@ -253,7 +255,7 @@ public class LibrarySystem {
             if (book.getTitle().equals(renewTitle)) {
                 if (book.canRenew()) {
                     // If the item is requested by another user, it cannot be renewed
-                    if (isItemRequested(book)) {
+                    if (book.isItemRequested()) {
                         System.out.println("Cannot renew the book. There is an outstanding request for this item.");
                         return false;
                     } else {
@@ -275,7 +277,7 @@ public class LibrarySystem {
             if (avMaterial.getTitle().equals(renewTitle)) {
                 if (avMaterial.canRenew()) {
                     // If the item is requested by another user, it cannot be renewed
-                    if (isItemRequested(avMaterial)) {
+                    if (avMaterial.isItemRequested()) {
                         System.out.println("Cannot renew the AV material. There is an outstanding request for this item.");
                         return false;
                     } else {
@@ -297,13 +299,9 @@ public class LibrarySystem {
         return false;
     }
 
-    private boolean isItemRequested(LibraryItem item) {
-        return false;
-    }
-
     public void requestItem(User user, LibraryItem item) {
         if (!item.isReferenceOnly()) {
-            // Implement the logic to handle item requests here
+            item.toggleRequest(false);
             System.out.println("Item request for " + item.getTitle() + " submitted by " + user.getName());
         } else {
             System.out.println("Reference items cannot be requested.");

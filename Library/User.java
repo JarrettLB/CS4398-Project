@@ -95,7 +95,8 @@ class User {
                         item.setDueDate(true);
                         System.out.println(item.getTitle() + " renewed successfully for " + getName());
                     }
-                } else {
+                } 
+                else {
                     System.out.println("Cannot renew the item. Maximum renewal limit reached.");
                 }
             } else {
