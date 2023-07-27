@@ -1,3 +1,9 @@
+// Project name: CS4398-Project
+//
+// Authors: Jarrett Bedynek, Danny Borja Jr., Marshall Edgar
+// Software Engineering Project
+// CS 4398 Summer 2023
+
 import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {

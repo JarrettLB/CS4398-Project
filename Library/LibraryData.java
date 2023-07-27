@@ -6,7 +6,6 @@ public class LibraryData {
     }
 
     public void initData() {
-
         
         // Create and add some users
         User user1 = new User("Bedynek, Jarrett", "123 Main St", "555-1234", "0001", 28);

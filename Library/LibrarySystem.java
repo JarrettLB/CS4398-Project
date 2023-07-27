@@ -208,7 +208,7 @@ public class LibrarySystem {
         }
     
         // Check if the user has reached the maximum allowed checkouts
-        if (user.getAge() <= 12 && user.getCheckedOutBooks().size() + user.getCheckedOutAVMaterials().size() >= MAX_ALLOWED_CHECKOUTS) {
+        else if (user.getAge() <= 12 && user.getCheckedOutBooks().size() + user.getCheckedOutAVMaterials().size() >= MAX_ALLOWED_CHECKOUTS) {
             System.out.println("You have already checked out the maximum amount of items.");
             return false;
         }
@@ -287,7 +287,6 @@ public class LibrarySystem {
                         return false;
                     } else {
                         // Renew the book
-                        //LocalDate newDueDate = book.getDueDate().plusDays(book.getCheckoutPeriod());
                         book.setDueDate(true);
                         book.incrementRenewalCount(); // Update the renewal count
                         System.out.println(book.getTitle() + " renewed successfully for " + user.getName() + " (Due: " + book.getDueDate() + ")");
@@ -310,7 +309,6 @@ public class LibrarySystem {
                         return false;
                     } else {
                         // Renew the AV material
-                        //LocalDate newDueDate = avMaterial.getDueDate().plusDays(avMaterial.getCheckoutPeriod());
                         avMaterial.setDueDate(true);
                         avMaterial.incrementRenewalCount(); // Update the renewal count
                         System.out.println(avMaterial.getTitle() + " renewed successfully for " + user.getName() + " (Due: " + avMaterial.getDueDate() + ")");
