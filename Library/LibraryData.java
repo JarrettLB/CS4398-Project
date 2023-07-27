@@ -38,7 +38,7 @@ public class LibraryData {
 
         // Create and add an overdue book to a user
         Book overdueBook = new Book("Overdue Book", false, false);
-        overdueBook.setDueDate(true); // Due date set 14 days in the past
+        overdueBook.setDueDate(true);
         user2.addCheckedOutBook(overdueBook);
 
         // Create and add some audio/video materials

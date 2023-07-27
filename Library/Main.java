@@ -17,7 +17,7 @@ public class Main {
         do {
             System.out.println("What would you like to do?");
             System.out.println("    1. Add User");
-            System.out.println("    2. Lookup User");
+            System.out.println("    2. Find User Account");
             System.out.println("    3. Add Book");
             System.out.println("    4. Lookup Book");
             System.out.println("    5. Add Audio/Video Material");
@@ -77,6 +77,7 @@ public class Main {
                             System.out.println("    2. Check Out an Item");
                             System.out.println("    3. Return an Item");
                             System.out.println("    4. Renew an Item");
+                            System.out.println("    5. Request an Item");
                             System.out.println("    0. Back to Main Menu");
 
                             System.out.print("Enter your choice: ");
@@ -95,7 +96,6 @@ public class Main {
                                         System.out.println("\nOptions for checking out item:");
                                         System.out.println("    1. Checkout Book");
                                         System.out.println("    2. Checkout Audio/Video Material");
-                                        System.out.println("    3. Request An Item");
                                         System.out.println("    0. Back to Previous Menu");
                     
                                         System.out.print("Enter your choice: ");
@@ -108,23 +108,6 @@ public class Main {
                                                 break;
                                             case 2:
                                                 librarySystem.handleCheckoutAVMaterial(foundUser, librarySystem);
-                                                break;
-                                            case 3:
-                                                // Request an Item
-                                                librarySystem.handleShowCheckedOutItems(foundUser);
-                                                System.out.print("Enter the title of the item to request: ");
-                                                String requestTitle = scanner.nextLine();
-
-                                                LibraryItem itemToRequest = librarySystem.getBookByTitle(requestTitle);
-                                                if (itemToRequest == null) {
-                                                    itemToRequest = librarySystem.getAVMaterialByTitle(requestTitle);
-                                                }
-
-                                                if (itemToRequest != null) {
-                                                    librarySystem.requestItem(foundUser, itemToRequest, scanner);
-                                                } else {
-                                                    System.out.println("Item with the title \"" + requestTitle + "\" not found.");
-                                                }
                                                 break;
                                             case 0:
                                                 // Back to Previous Menu
@@ -152,7 +135,23 @@ public class Main {
                                     // Renew an Item
                                     librarySystem.renewItem(foundUser, scanner);
                                     break;
+                                case 5:
+                                    // Request an Item
+                                    librarySystem.handleShowCheckedOutItems(foundUser);
+                                    System.out.print("Enter the title of the item to request: ");
+                                    String requestTitle = scanner.nextLine();
 
+                                    LibraryItem itemToRequest = librarySystem.getBookByTitle(requestTitle);
+                                    if (itemToRequest == null) {
+                                        itemToRequest = librarySystem.getAVMaterialByTitle(requestTitle);
+                                    }
+
+                                    if (itemToRequest != null) {
+                                        librarySystem.requestItem(foundUser, itemToRequest, scanner);
+                                    } else {
+                                        System.out.println("Item with the title \"" + requestTitle + "\" not found.");
+                                    }
+                                    break;
                                 case 0:
                                     // Back to Main Menu
                                     System.out.println("Returning to the Main Menu.");

@@ -1,7 +1,6 @@
 import java.util.*;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-
 public class LibrarySystem {
     private List<User> users;
     private List<Book> availableBooks;
@@ -16,7 +15,10 @@ public class LibrarySystem {
         this.nextLibraryCardNumber = 1;
     }
 
+//******************************************************************************
     // Case 1: Add User with the next available library card number
+//******************************************************************************
+
     public void addUser(User user) {
         String libraryCardNumber = String.format("%04d", nextLibraryCardNumber);
         user.setLibraryCardNumber(libraryCardNumber);
@@ -24,7 +26,10 @@ public class LibrarySystem {
         nextLibraryCardNumber++; // Increment the next library card number for the next user
     }
 
+//******************************************************************************
     // Case 2: Lookup User
+//******************************************************************************
+
     public User getUserByLibraryCardNumber(String libraryCardNumber) {
         for (User user : users) {
             if (user.getLibraryCardNumber().equals(libraryCardNumber)) {
@@ -34,12 +39,18 @@ public class LibrarySystem {
         return null;
     }
 
+//******************************************************************************
     // Case 3: Add Book
+//******************************************************************************
+
     public void addBook(Book book) {
         availableBooks.add(book);
     }
 
+//******************************************************************************
     // Case 4: Lookup Book
+//******************************************************************************
+
     public Book getBookByTitle(String title) {
         for (Book book : availableBooks) {
             if (book.getTitle().equals(title)) {
@@ -49,12 +60,18 @@ public class LibrarySystem {
         return null; // Book not found
     }
 
+//******************************************************************************
     // Case 5: Add Audio/Video Material
+//******************************************************************************
+
     public void addAudioVideoMaterial(AudioVideoMaterial avMaterial) {
         availableAudioVideoMaterials.add(avMaterial);
     }
 
+//******************************************************************************
     // Case 6: Lookup Audio/Video Material
+//******************************************************************************
+
     public AudioVideoMaterial getAVMaterialByTitle(String title) {
         for (AudioVideoMaterial avMaterial : availableAudioVideoMaterials) {
             if (avMaterial.getTitle().equalsIgnoreCase(title)) {
@@ -64,21 +81,29 @@ public class LibrarySystem {
         return null; // Audio/Video Material not found
     }
 
+//******************************************************************************
+
     // Returns next available library card number
     public int getNextLibraryCardNumber() {
         int nextLibraryCardNumber = users.size() + 1;
         return nextLibraryCardNumber;
     }
 
+//******************************************************************************
+
     // Returns list of available books
     public List<Book> getAvailableBooks() {
         return availableBooks;
     }
 
+//******************************************************************************
+
     // Returns list of available AV Material
     public List<AudioVideoMaterial> getAvailableAudioVideoMaterials() {
         return availableAudioVideoMaterials;
     }
+
+//******************************************************************************
 
     // Shows lists of all checked out items for a user
     public void handleShowCheckedOutItems(User user) {
@@ -105,6 +130,8 @@ public class LibrarySystem {
         }
     }
 
+//******************************************************************************
+
     // Handler for checking out books
     public void handleCheckOutBook(User user, LibrarySystem librarySystem) {
         System.out.print("Enter the title of the book you want to check out:");
@@ -123,6 +150,8 @@ public class LibrarySystem {
             System.out.println("Book \"" + bookTitle + "\" not found in the library.");
         }
     }
+
+//******************************************************************************
     
     // Handler for checking out AV Material
     public void handleCheckoutAVMaterial(User user, LibrarySystem librarySystem) {
@@ -142,6 +171,8 @@ public class LibrarySystem {
             System.out.println("AV Material \"" + AVTitle + "\" not found in the library.");
         }
     }
+
+//******************************************************************************
     
     // Checks out an item based on available material - verifies age, current amount of material checked out and bestSeller status
     public boolean checkoutItem(User user, String itemTitle) {
@@ -199,6 +230,8 @@ public class LibrarySystem {
         return true;
     }
 
+//******************************************************************************
+
     public boolean returnItem(User user, Scanner scanner) {
         List<Book> checkedOutBooks = user.getCheckedOutBooks();
         List<AudioVideoMaterial> checkedOutAVMaterials = user.getCheckedOutAVMaterials();
@@ -232,6 +265,7 @@ public class LibrarySystem {
         return false;
     }
     
+//******************************************************************************
     
     // Renew an item once after checking it is not requested
     public boolean renewItem(User user, Scanner scanner) {
@@ -294,6 +328,7 @@ public class LibrarySystem {
         return false;
     }
     
+//******************************************************************************
     
     public void requestItem(User user, LibraryItem item, Scanner scanner) {
         if (!item.isReferenceOnly()) {
@@ -313,6 +348,8 @@ public class LibrarySystem {
         }
     }
 
+//******************************************************************************
+
     public double calculateOverdueFines(User user) {
         double totalFines = 0.0;
 
@@ -325,9 +362,9 @@ public class LibrarySystem {
                 // Ensure the fine doesn't exceed the maximum allowed fine for a book
                 fine = Math.min(fine, checkedOutBook.getMaxFine());
                 totalFines += fine;
+            }
         }
+        return totalFines;
     }
-    return totalFines;
-}
 
 }
