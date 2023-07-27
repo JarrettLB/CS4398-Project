@@ -8,18 +8,12 @@ public class LibrarySystem {
     private List<AudioVideoMaterial> availableAudioVideoMaterials;
     private static final int MAX_ALLOWED_CHECKOUTS = 5;
     private int nextLibraryCardNumber;
-    private boolean isItemRequested;
 
     public LibrarySystem() {
         this.users = new ArrayList<>();
         this.availableBooks = new ArrayList<>();
         this.availableAudioVideoMaterials = new ArrayList<>();
         this.nextLibraryCardNumber = 1;
-        this.isItemRequested = true;
-
-        // Initialize data using LibraryDataInitializer
-        LibraryData dataInitializer = new LibraryData(this);
-        dataInitializer.initData();
     }
 
     // Case 1: Add User with the next available library card number
@@ -239,29 +233,29 @@ public class LibrarySystem {
     }
     
     
-
     // Renew an item once after checking it is not requested
     public boolean renewItem(User user, Scanner scanner) {
         List<Book> checkedOutBooks = user.getCheckedOutBooks();
         List<AudioVideoMaterial> checkedOutAVMaterials = user.getCheckedOutAVMaterials();
-
+    
         handleShowCheckedOutItems(user);
-
+    
         System.out.print("Enter the title of the item to renew: ");
         String renewTitle = scanner.nextLine();
-
+    
         // Check if the item is a book
         for (Book book : checkedOutBooks) {
             if (book.getTitle().equals(renewTitle)) {
                 if (book.canRenew()) {
-                    // If the item is requested by another user, it cannot be renewed
+                    // Check if the item is requested by another user, prevent renewal if requested
                     if (book.isItemRequested()) {
                         System.out.println("Cannot renew the book. There is an outstanding request for this item.");
                         return false;
                     } else {
                         // Renew the book
-                        LocalDate newDueDate = book.getDueDate().plusDays(book.getCheckoutPeriod());
+                        //LocalDate newDueDate = book.getDueDate().plusDays(book.getCheckoutPeriod());
                         book.setDueDate(true);
+                        book.incrementRenewalCount(); // Update the renewal count
                         System.out.println(book.getTitle() + " renewed successfully for " + user.getName() + " (Due: " + book.getDueDate() + ")");
                         return true;
                     }
@@ -271,19 +265,20 @@ public class LibrarySystem {
                 }
             }
         }
-
-        // If the item is not a book, check if it is an AV material
+    
+        // Check if the item is an AV material
         for (AudioVideoMaterial avMaterial : checkedOutAVMaterials) {
             if (avMaterial.getTitle().equals(renewTitle)) {
                 if (avMaterial.canRenew()) {
-                    // If the item is requested by another user, it cannot be renewed
+                    // Check if the item is requested by another user, prevent renewal if requested
                     if (avMaterial.isItemRequested()) {
                         System.out.println("Cannot renew the AV material. There is an outstanding request for this item.");
                         return false;
                     } else {
                         // Renew the AV material
-                        LocalDate newDueDate = avMaterial.getDueDate().plusDays(avMaterial.getCheckoutPeriod());
+                        //LocalDate newDueDate = avMaterial.getDueDate().plusDays(avMaterial.getCheckoutPeriod());
                         avMaterial.setDueDate(true);
+                        avMaterial.incrementRenewalCount(); // Update the renewal count
                         System.out.println(avMaterial.getTitle() + " renewed successfully for " + user.getName() + " (Due: " + avMaterial.getDueDate() + ")");
                         return true;
                     }
@@ -293,16 +288,26 @@ public class LibrarySystem {
                 }
             }
         }
-
+    
         // Item not found
         System.out.println("Item with the title \"" + renewTitle + "\" is not checked out by " + user.getName());
         return false;
     }
-
-    public void requestItem(User user, LibraryItem item) {
+    
+    
+    public void requestItem(User user, LibraryItem item, Scanner scanner) {
         if (!item.isReferenceOnly()) {
-            item.toggleRequest(false);
-            System.out.println("Item request for " + item.getTitle() + " submitted by " + user.getName());
+            System.out.println("Would you like to request \"" + item.getTitle() + "\"? (yes/no)");
+            String userResponse = scanner.nextLine().trim().toLowerCase();
+    
+            if (userResponse.equals("yes")) {
+                item.toggleRequest(true);
+                System.out.println("Item request for " + item.getTitle() + " submitted by " + user.getName());
+            } else if (userResponse.equals("no")) {
+                System.out.println("Item request for " + item.getTitle() + " cancelled.");
+            } else {
+                System.out.println("Invalid response. Please enter 'yes' or 'no'.");
+            }
         } else {
             System.out.println("Reference items cannot be requested.");
         }

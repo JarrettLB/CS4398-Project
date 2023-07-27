@@ -111,18 +111,17 @@ public class Main {
                                                 break;
                                             case 3:
                                                 // Request an Item
+                                                librarySystem.handleShowCheckedOutItems(foundUser);
                                                 System.out.print("Enter the title of the item to request: ");
                                                 String requestTitle = scanner.nextLine();
 
-                                                // Find the item with the given title
-                                                Book foundBookForRequest = librarySystem.getBookByTitle(requestTitle);
-                                                AudioVideoMaterial foundAVMaterialForRequest = librarySystem.getAVMaterialByTitle(requestTitle);
+                                                LibraryItem itemToRequest = librarySystem.getBookByTitle(requestTitle);
+                                                if (itemToRequest == null) {
+                                                    itemToRequest = librarySystem.getAVMaterialByTitle(requestTitle);
+                                                }
 
-                                                // If the item is found, call the requestItem() method
-                                                if (foundBookForRequest != null) {
-                                                    librarySystem.requestItem(foundUser, foundBookForRequest);
-                                                } else if (foundAVMaterialForRequest != null) {
-                                                    librarySystem.requestItem(foundUser, foundAVMaterialForRequest);
+                                                if (itemToRequest != null) {
+                                                    librarySystem.requestItem(foundUser, itemToRequest, scanner);
                                                 } else {
                                                     System.out.println("Item with the title \"" + requestTitle + "\" not found.");
                                                 }

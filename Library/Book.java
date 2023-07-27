@@ -3,13 +3,14 @@ import java.time.LocalDate;
 class Book extends LibraryItem implements Checkoutable{
     private LocalDate dueDate;
     private boolean checkedOut;
-    private boolean isItemRequested;
+    private static final int MAX_RENEWAL_COUNT = 1;
+    private int renewalCount;
 
     public Book(String title, boolean isReferenceOnly, boolean isBestSeller) {
         super(title, isReferenceOnly, isBestSeller);
         setDueDate(isBestSeller);
         this.checkedOut = false;
-        this.isItemRequested = true;
+        this.renewalCount = 0;
     }
 
     @Override
@@ -52,7 +53,11 @@ class Book extends LibraryItem implements Checkoutable{
 
     @Override
     public boolean canRenew() {
-        return true;
+        return renewalCount < MAX_RENEWAL_COUNT;
+    }
+
+    public void incrementRenewalCount() {
+        renewalCount++;
     }
 
     public void setCheckedOut(boolean checkedOut) {
@@ -62,13 +67,5 @@ class Book extends LibraryItem implements Checkoutable{
     @Override
     public boolean isAvailable() {
         return !checkedOut;
-    }
-
-    public boolean isItemRequested() {
-        return isItemRequested;
-    }
-
-    public void toggleRequest(boolean isItemRequested){
-        isItemRequested = !isItemRequested;
     }
 }

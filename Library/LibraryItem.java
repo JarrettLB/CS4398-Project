@@ -5,13 +5,14 @@ abstract class LibraryItem {
     private boolean isReferenceOnly;
     private boolean isBestSeller;
     private LocalDate dueDate;
-    //private boolean isItemRequested;
+    private boolean isItemRequested;
+    private int renewalCount;
 
     public LibraryItem(String title, boolean isReferenceOnly, boolean isBestSeller) {
         this.title = title;
         this.isReferenceOnly = isReferenceOnly;
         this.isBestSeller = isBestSeller;
-        //this.isItemRequested = true;
+        this.isItemRequested = false;
     }
 
     public String getTitle() {
@@ -44,11 +45,25 @@ abstract class LibraryItem {
         return true;
     }
 
-    //private boolean isItemRequested() {
-    //    return isItemRequested;
-    //}
+    public int getRenewalCount() {
+        return renewalCount;
+    }
 
-    public abstract void toggleRequest(boolean isItemRequested);
+    public void setRenewalCount(int renewalCount) {
+        this.renewalCount = renewalCount;
+    }
+
+    public void incrementRenewalCount() {
+        this.renewalCount++;
+    }
+
+    protected boolean isItemRequested() {
+        return isItemRequested;
+    }
+
+    public void toggleRequest(boolean isItemRequested) {
+        this.isItemRequested = isItemRequested;
+    }
 
     public boolean isAvailable() {
         return dueDate == null; // If the due date is null, the item is available
